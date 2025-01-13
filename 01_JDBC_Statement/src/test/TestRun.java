@@ -60,7 +60,7 @@ public class TestRun {
 			// 1) jdbc driver 등록									패키지.클래스 이름 ㄱ
 			// Class.forName(클래스명); 		Class.forName("oracle.jdbc.driver.클래스명");
 			// 외부 파일을 마치 내것처럼 등록하겠다라는 의미! ㅡ 그 클래스에 있는 메소드를 호출하거나... 등을 활용하기 위해
-			Class.forName("oracle.jdbc.driver.OracleDriver"); // ojdbc6.jar 파일을 추가 안했을 경우 | 추가는 했는데 오타가 있을 경우 => ClassNotFoundException 오류 발생! ㅡ 프로젝트 만들때마다 추가해주어야함
+			Class.forName("oracle.jdbc.driver.OracleDriver"); // ojdbc6.jar 파일을 추가 안했을 경우 | 추가는 했는데 오타가 있을 경우 => ClassNotFoundException 오류 발생! ㅡ 프로젝트 만들때마다  ojdbc6.jar 파일 추가해줘야함
 
 			// 2) Connection 객체 생성 : DB에 연결(url, 계정명, 비밀번호)
 			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "JDBC", "JDBC");
@@ -134,7 +134,7 @@ public class TestRun {
 			// 3) Statement 객체 생성
 			stmt = conn.createStatement();
 			
-			// 4,5) sql문 절달해서 실행 후 결과 받기(ResultSet)
+			// 4,5) sql문 전달해서 실행 후 결과 받기(ResultSet)
 			rset = stmt.executeQuery(sql);
 			
 			// 6) 
