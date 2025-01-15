@@ -121,14 +121,22 @@ public class EmployeeMenu {
 	
 	
 	
-    public String deleteEmployee() {
-        System.out.println("\n==== 사원 삭제 ====");
-        System.out.print("삭제할 사원명 입력 : ");
-        return sc.nextLine();
+//    public String deleteEmployee() {
+//        System.out.println("\n==== 사원 삭제 ====");
+//        System.out.print("삭제할 사원명 입력 : ");
+//        return sc.nextLine();
+//
+//    }
 
-    }
-
-	
+	public String deleteEmployee() {
+	    System.out.println("\n==== 사원 삭제 ====");
+	    
+	    System.out.print("삭제할 사원명 입력 : ");
+	    String empName = sc.nextLine();
+	    
+	    // 사원명을 기반으로 사원 ID를 찾아서 삭제하도록 변경할 수도 있음
+	    return empName;
+	}
 	
 	
 		
