@@ -17,7 +17,7 @@ public class EmployeeDao {
 		Connection conn = null;
 		Statement stmt = null;
 		
-		String sql = "INSERT INTO COPY_EMP VALUES(SEQ_EMP_ID.NEXTVAL,"
+		String sql = "INSERT INTO COPY_EMP VALUES(SEQ_EMPNO.NEXTVAL, "
 						+ "'" + e.getEmpName() + "', "
 						+ "'" + e.getEmpNo() + "', "
 						+ "'" + e.getEmail() + "', "
@@ -27,14 +27,14 @@ public class EmployeeDao {
 						+ "'" + e.getSalLevel() + "', "
 							  + e.getSalary() + ", "
 						      + e.getBonus() + ", "
-						+ "'" + e.getManagerId() + "', SYSDATE, NULL, " + "'" + "N" + "'" + ")";
+						+ "'" + e.getManagerId() + "', SYSDATE, NULL, 'N')";
 		
 		System.out.print(sql);
 						
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			
-			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "JDBC", "JDBC");
+			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "kh", "kh");
 			
 			stmt = conn.createStatement();
 			
@@ -81,7 +81,7 @@ public class EmployeeDao {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			
-			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","JDBC","JDBC");
+			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","kh","kh");
 			
 			stmt = conn.createStatement();
 			
@@ -134,16 +134,18 @@ public class EmployeeDao {
 		Connection conn = null;
 		Statement stmt = null;
 		
-		String sql = "UPDATE EMPLOYEE "
+		String sql = "UPDATE COPY_EMP "
 				   + "SET EMAIL = '" + e.getEmail() + "'"
 				   +   ", PHONE = '" + e.getPhone() + "'"
-				   +   ", SALARY = '" + e.getSalary() + "'"
-				   + "WHERE EMP_ID = " + e.getEmpId() + "'";
+				   +   ", SALARY = " + e.getSalary()  
+				   +  " WHERE EMP_ID = '" + e.getEmpId() + "'";
+		
+		System.out.println(sql);
 		
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			
-			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","JDBC","JDBC");
+			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","kh","kh");
 			stmt = conn.createStatement();
 			result = stmt.executeUpdate(sql);
 			
@@ -168,16 +170,52 @@ public class EmployeeDao {
 		}
 		
 		return result;
-		
-		
-		
-		
+
 	}
 	
 	
 	
 	
-	
+ //사원 삭제 
+	public int deleteByEmployeeName(String deleteEmpName) {
+	    int result = 0;
+	    Connection conn = null;
+	    Statement stmt = null;
+
+	    String sql = "DELETE FROM COPY_EMP WHERE EMP_NAME = '" + deleteEmpName + "'";  // 이름으로 삭제
+
+	    try {
+	        Class.forName("oracle.jdbc.driver.OracleDriver");
+	        conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "kh", "kh");
+	        stmt = conn.createStatement();
+
+	        result = stmt.executeUpdate(sql);
+
+	        if (result > 0) {
+	            conn.commit();
+	        } else {
+	            conn.rollback();
+	        }
+
+	    } catch (ClassNotFoundException e) {
+	        e.printStackTrace();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        try {
+	            stmt.close();
+	            conn.close();
+	        } catch (SQLException e) {
+	            e.printStackTrace();
+	        }
+	    }
+
+	    return result;
+	}
+
+
+
+
 	
 	
 	

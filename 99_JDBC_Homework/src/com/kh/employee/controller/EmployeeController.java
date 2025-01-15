@@ -7,6 +7,7 @@ import com.kh.employee.model.dao.EmployeeDao;
 import com.kh.employee.model.vo.Employee;
 import com.kh.employee.view.EmployeeMenu;
 
+
 public class EmployeeController {
 	
 	
@@ -57,25 +58,34 @@ public class EmployeeController {
 		e.setEmpId(empId);
 		e.setEmail(email);
 		e.setPhone(phone);
-		e.setSalary(salary);
+		e.setSalary(Integer.parseInt(salary));
 		
-		int result = new EmployeeDao().updateEmployee(e);
+		int result = new EmployeeDao().updateEmployee(e); // DAO의 updateEmployee 호출
+		
+		System.out.println(e);
 		
 		if(result > 0){
-			new EmployeeMenu().displaySuccess("성공적으로 사원 정보가 변경되었습니다.");
-			
-		}else {
-			new EmployeeMenu().displayFail("사원 정보 변경에 실패했습니다.");
-		}
+	        new EmployeeMenu().displaySuccess("성공적으로 사원 정보가 변경되었습니다.");
+	    } else {
+	        new EmployeeMenu().displayFail("사원 정보 변경에 실패했습니다.");
+	    }
+	
 		
 		
 	}
 	
 	
 	
-	
-	
-	
+	public void deleteByEmployeeName(String deleteEmpName) {
+        int result = new EmployeeDao().deleteByEmployeeName(deleteEmpName);
+
+        // 삭제 성공 여부 출력
+        if (result > 0) {
+            new EmployeeMenu().displaySuccess("사원 삭제가 완료되었습니다.");
+        } else {
+        	new EmployeeMenu().displayFail("사원 삭제에 실패했습니다.");
+        }
+    }
 	
 
 }//

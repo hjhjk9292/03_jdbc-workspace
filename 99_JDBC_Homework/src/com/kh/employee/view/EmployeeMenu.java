@@ -35,7 +35,9 @@ public class EmployeeMenu {
 			case 1 : inputEmp(); break;
 			case 2 : ec.selectList(); break;
 			case 3 : updateEmployee(); break;
-			case 4 : /**/ break;
+			case 4 : String deleteEmpName = deleteEmployee(); // 이름 입력받기
+            ec.deleteByEmployeeName(deleteEmpName); // 이름으로 삭제 처리
+            break;
 			case 0 : System.out.println("이용해주셔서 감사합니다."); return;
 			default : System.out.println("메뉴를 잘못 입력하셨습니다. 다시 입력해주세요.");
 	
@@ -53,8 +55,7 @@ public class EmployeeMenu {
 	public void inputEmp() {
 		System.out.println("\n==== 사원 추가 ====");
 		
-		System.out.print("사원번호 : ");
-		String empId = sc.nextLine();
+		String empId = ""; // 사용자가 입력하지 않음
 		
 		System.out.print("직원명 : ");
 		String empName = sc.nextLine();
@@ -96,10 +97,6 @@ public class EmployeeMenu {
 	}
 
 
-	public String inputEmployeeId() {
-		System.out.print("\n사원 아이디 입력 : ");
-		return sc.nextLine();
-	}
 	
 	//사용자에게 변경하려고 하는 사원의 사번을 입력 받은 뒤 
 //	이메일, 전화번호, 급여를 변경하는 UPDATE를 진행한다.
@@ -109,13 +106,13 @@ public class EmployeeMenu {
 		System.out.print("사원번호 입력 : ");
 		String empId = sc.nextLine();
 		
-		System.out.println("변경할 이메일 : ");
+		System.out.print("변경할 이메일 : ");
 		String email = sc.nextLine();
 		
-		System.out.println("변경할 전화번호 : ");
+		System.out.print("변경할 전화번호 : ");
 		String phone = sc.nextLine();
 		
-		System.out.println("변경할 급여 : ");
+		System.out.print("변경할 급여 : ");
 		String salary = sc.nextLine();
 		
 		ec.updateEmployee(empId, email, phone, salary);
@@ -124,6 +121,13 @@ public class EmployeeMenu {
 	
 	
 	
+    public String deleteEmployee() {
+        System.out.println("\n==== 사원 삭제 ====");
+        System.out.print("삭제할 사원명 입력 : ");
+        return sc.nextLine();
+
+    }
+
 	
 	
 	
