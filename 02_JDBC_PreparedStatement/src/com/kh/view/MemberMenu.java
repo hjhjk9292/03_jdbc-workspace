@@ -38,21 +38,10 @@ public class MemberMenu {
 			switch(menu) {
 			case 1 : inputMember(); break;
 			case 2 : mc.selectList(); break;
-			case 3 : // String userId = inputMemberId(); 
-					 // mc.selectByUserId(userId);	
-					 mc.selectByUserId(inputMemberId()); // 위의 코드처럼 한줄로
-					 break;
-			case 4 : // String keyword = inputMemberName();
-					 // mc.selectByUserName(keyword);
-				    mc.selectByUserName(inputMemberName()); // 위의 코드를 한 줄로
-					break;
+			case 3 : mc.selectByUserId(inputMemberId()); break;
+			case 4 : mc.selectByUserName(inputMemberName()); break;
 			case 5 : updateMember(); break;
-			case 6 : //String userId2 = inputMemberId();
-					 //mc.deleteMember(userId2); // 양말을 박스에 넣어서 주는 코드 // 밑의 코드처럼 한줄로 만들기 가능
-					mc.deleteMember(inputMemberId()); // 양말을 주는 코드
-					break;
-			/*String deleteUserId = deleteMember(); 
-					 mc.deleteByUserId(deleteUserId); break;*/
+			case 6 : mc.deleteMember(inputMemberId()); break;
 			case 0 : System.out.println("이용해주셔서 감사합니다."); return;
 			default : System.out.println("메뉴를 잘못 입력하셨습니다. 다시 입력해주세요");
 			

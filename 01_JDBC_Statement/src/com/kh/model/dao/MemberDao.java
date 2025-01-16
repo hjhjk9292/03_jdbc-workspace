@@ -375,6 +375,55 @@ public class MemberDao {
 	
 	
 	
+	/**
+	 * 사용자가 입력한 아이디값 전달 받아서 회원 탈퇴 시켜주는 메소드
+	 * @param userId	사용자가 입력한 아이디값
+	 * @return 처리된 행 수
+	 */
+	public int deleteMember(String userId) {
+		/* DELETE FROM MEMBER WHERE USERID = '사용자가 입력한 아이디값' */
+		// delete문 => 처리된 행수(int) => 트랜젝션 처리
+		int result = 0;
+		
+		Connection conn = null; // ㅡ 객체 : 주소값 들어 있는 거, null로 초기화
+		Statement stmt = null;
+		
+		String sql = "DELETE FROM MEMBER WHERE USERID = '" + userId + "'";
+		
+		try {
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","JDBC","JDBC"); // conn에 담지 않으면 밑에서 NullPointexception 나올것임. null로 초기화 해뒀어서
+			stmt = conn.createStatement(); 
+			
+			result = stmt.executeUpdate(sql); // 쿼리를 돌린 것을 result에 담아야함. 안하면 값이 위에서 설정한 0으로 나온다.
+			
+			if(result > 0) {
+				conn.commit();
+			}else {
+				conn.rollback();
+			}
+			
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) { // try문 것을 처리
+			e.printStackTrace();
+		}finally {
+			try {
+				stmt.close();
+				conn.close();
+				
+			} catch (SQLException e) { // finally로 나왔으니까 따로 작성
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+		
+	}
+	
+	
+	
+/*	위에는 선생님의 코드 밑에는 내가 작성한 delete 코드
 	public int deleteByUserId(String deleteUserId) {
 		
 		int result = 0;
@@ -421,7 +470,7 @@ public class MemberDao {
 		
 		
 	}
-	
+*/	
 
 
 	

@@ -21,25 +21,14 @@ public class MemberController {
 	 */
 	public void insertMember(String userId, String userPwd, String userName, String gender, String age, String email, String phone, String address, String hobby) {
 		
-		// view로 부터 전달 받은 값을 바로 dao쪽으로 전달 x
-		// 어딘가에(Member 객체) 주섬주섬 담아 전달 ㅡ vo에 담는거..
-		
-		// 방법1) 기본생성자로 생성한 후 각 필드의 setter 메소드를 통해서 일일히 담는 방법
-		// 방법2) 아싸리 매개변수 생성자로 생성과 동시에 담는 방법 ㅡ sql 확인해서 시퀀스와 데이트인거는 제외해서 담기
-
-//		Member m = new Member(); ㅡ 방법1			ㅡ 나이 string type이니까 형변환 시켜주기ㄱ
-		Member m = new Member(userId, userPwd, userName, gender, Integer.parseInt(age), email, phone, address, hobby); // ㅡ 방법2 Member객체 m을 만든 거
-		
-//		System.out.println(m); // Member [userNo=0, userId=user02, userPwd=pass02, userName=김현지, gender=F, age=20, email=a@naver.com, phone=01077777777, address=인천, hobby=코딩하기, enrollDate=null]
-		
+		Member m = new Member(userId, userPwd, userName, gender, Integer.parseInt(age), email, phone, address, hobby);
 		int result = new MemberDao().insertMember(m);
 		
-		if(result > 0) { // 성공
+		if(result > 0) {
 			new MemberMenu().displaySuccess("성공적으로 회원 추가 되었습니다.");
-		}else { // 실패
-			new MemberMenu().displayFail("회원 추가를 실패했습니다..");
+		}else {
+			new MemberMenu().displayFail("회원 추가를 실패했습니다.");			
 		}
-		
 		
 	}
 	
@@ -50,13 +39,12 @@ public class MemberController {
 	 */
 	public void selectList() {
 		
-		ArrayList<Member> list = new MemberDao().selectList();
+		ArrayList<Member> list = new MemberDao().selectList(); // ㅡ ArrayList<Member> 에 담음, list가 아니라 다른 것으로 작성해도 되지만 똑같이 작성하는게 좋겠지..
 		
-		// 조회 결과 있는지 없는지 판단 한 후 사용자가 보게 될 응답화면 결정
-		if(list.isEmpty()) { // 텅 비어있을 경우 == 조회된 데이터 없었을 경우
+		if(list.isEmpty()) { // 텅 빈 데이터
 			new MemberMenu().displayNoData("전체 조회 결과가 없습니다.");
-		}else { // 뭐라도 조회된 데이터가 있을 경우
-			new MemberMenu().displayMemberList(list);
+		}else { // 뭐라도 담긴 데이터
+			new MemberMenu().displayMemberList(list); // MemberMenu 클레스에 있는 displayMemberList 메소드와 연결되어 향상된 for문으로 2.회원 전체 조회 가능
 		}
 	
 	}
@@ -72,12 +60,12 @@ public class MemberController {
 		
 		Member m = new MemberDao().selectByUserId(userId);
 		
-		if(m == null) { // 검색 결과가 없을 경우 (조회된 데이터 없음)
+		if(m == null) {
 			new MemberMenu().displayNoData(userId + "에 해당하는 검색 결과가 없습니다.");
-		}else { // 검색 결과가 있을 경우 (조회된 데이터 한 행 있음)
+		}else {
 			new MemberMenu().displayMember(m);
 		}
-
+		
 		
 		
 	}
@@ -89,13 +77,15 @@ public class MemberController {
 	 * @param keyword 사용자가 입력한 검색할 회원명(키워드)
 	 */
 	public void selectByUserName(String keyword) {
-		ArrayList<Member> list = new MemberDao().selectByUserName(keyword);
+		 ArrayList<Member> list = new MemberDao().selectByUserName(keyword);
 		
-		if(list.isEmpty()) { // 텅빈 리스트일 경우 => 검색 결과 없음
-			new MemberMenu().displayNoData(keyword + "에 해당하는 검색 결과가 없습니다.");
-		}else { // 그게 아닐 경우 => 검색 결과 있음
-			new MemberMenu().displayMemberList(list); // 자바의 특징 : 메소드 재활용 가능
-		}
+		 if(list.isEmpty()) {
+			 new MemberMenu().displayNoData(keyword + "에 해당하는 검색 결과가 없습니다.");
+		 }else {
+			 new MemberMenu().displayMemberList(list);
+		 }
+		
+		
 		
 	}
 	
@@ -111,22 +101,23 @@ public class MemberController {
 	 */
 	public void updateMember(String userId, String userPwd, String email, String phone, String address) {
 		
-		Member m = new Member(); // ㅡ 가방에 담는 거
+		Member m = new Member(); // 기본생성자로 만들어서 가방 역할로 위의 매개변수를 담아주기
 		
 		m.setUserId(userId);
 		m.setUserPwd(userPwd);
 		m.setEmail(email);
 		m.setPhone(phone);
-		m.setAddress(address); // ㅡ 이 작업을 안하면 밑에 매개변수 또 다 작성해줘야함
+		m.setAddress(address);
 		
 		int result = new MemberDao().updateMember(m);
 		
-		if(result > 0) { // 성공
+		if(result > 0) {
 			new MemberMenu().displaySuccess("성공적으로 회원 정보가 변경되었습니다.");
-			
-		}else { // 실패
+		}else {
 			new MemberMenu().displayFail("회원 정보 변경에 실패했습니다.");
 		}
+		
+		
 				
 	}
 	
@@ -141,11 +132,13 @@ public class MemberController {
 		
 		int result = new MemberDao().deleteMember(userId);
 		
-		if(result > 0) { //성공
-			new MemberMenu().displaySuccess("성공적으로 탈퇴했다~");			
-		} else { // 실패
-			new MemberMenu().displayFail("회원탈퇴에 실패 했다...");
+		if(result > 0) {
+			new MemberMenu().displaySuccess("회원 탈퇴되었습니다.");
+		}else {
+			new MemberMenu().displayFail("회원 탈퇴에 실패했습니다.");
 		}
+
+
 		
 	}
 	
