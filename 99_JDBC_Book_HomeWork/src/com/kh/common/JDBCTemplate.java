@@ -1,39 +1,33 @@
 package com.kh.common;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
-// 공통 템플릿(매번 반복적으로 작성될 코드를 메소드로 정의해둘꺼임)
 public class JDBCTemplate {
 
-	// 1. Connection 객체 생성(DB와 접속)한 후 해당 Connection 반환해주는 메소드
-	public static Connection getConnection() { // ㅡ 커넥션 받고 싶은 사람 이거 써라~
-
+	// 1. Connection 객체 생성(DB와 접속)
+	public static Connection getConnection() {
 		Connection conn = null;
 
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "BOOK", "BOOK"); // url, 계정명, 비번을
-																										// conn에 담을거다
-			conn.setAutoCommit(false);
-
+			conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "BOOK", "BOOK");
+			conn.setAutoCommit(false); // 자동 커밋 비활성화
+			System.out.println("DB 연결 성공!");
 		} catch (ClassNotFoundException e) {
+			System.out.println("OracleDriver를 찾을 수 없습니다.");
 			e.printStackTrace();
 		} catch (SQLException e) {
+			System.out.println("DB 연결에 실패했습니다.");
 			e.printStackTrace();
 		}
 
 		return conn;
-
 	}
 
-	// 2. commit을 처리해주는 메소드(남이 주는 Connection 전달받아서 => 전달 받고 싶으면 매개변수에 써라,,,)
-	public static void commit(Connection conn) { // static 이라고 작성하면 생성하지 않고도 랜덤처럼 사용 가능... => dao 클래스에 6) 작성
+	// 2. Commit
+	public static void commit(Connection conn) {
 		try {
-			if (conn != null && !conn.isClosed()) { // conn이 null이 아니고 conn이 닫혀있지 않을 때
+			if (conn != null && !conn.isClosed()) {
 				conn.commit();
 			}
 		} catch (SQLException e) {
@@ -41,8 +35,8 @@ public class JDBCTemplate {
 		}
 	}
 
-	// 3. rollback 처리해주는 메소드(Connection 전달 받아서)
-	public static void rollback(Connection conn) { //
+	// 3. Rollback
+	public static void rollback(Connection conn) {
 		try {
 			if (conn != null && !conn.isClosed()) {
 				conn.rollback();
@@ -52,9 +46,8 @@ public class JDBCTemplate {
 		}
 	}
 
-	// JDBC용 객체들 전달 받아서 반납처리해주는 메소드
-	// 4. Statement 관련 객체 전달 받아서 반납시켜주는 메소드
-	public static void close(Statement stmt) { // 다형성 적용 (Statement가 부모니까, PreparedStatement 안 만들어도 됨)
+	// 4. Statement 닫기
+	public static void close(Statement stmt) {
 		try {
 			if (stmt != null && !stmt.isClosed()) {
 				stmt.close();
@@ -64,19 +57,29 @@ public class JDBCTemplate {
 		}
 	}
 
-	// 5. Connection 객체 전달 받아서 반납 시켜주는 메소드
+	// 5. PreparedStatement 닫기
+	public static void close(PreparedStatement pstmt) { // 추가
+		try {
+			if (pstmt != null && !pstmt.isClosed()) {
+				pstmt.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 6. Connection 닫기
 	public static void close(Connection conn) {
 		try {
-			if (conn != null && !conn.isClosed()) { // isClosed 는 sql을 throw하고 있으니까 surround catch
+			if (conn != null && !conn.isClosed()) {
 				conn.close();
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 	}
 
-	// 6. ResultSet 객체 전달 받아서 반납 시켜주는 메소드
+	// 7. ResultSet 닫기
 	public static void close(ResultSet rset) {
 		try {
 			if (rset != null && !rset.isClosed()) {
@@ -86,5 +89,4 @@ public class JDBCTemplate {
 			e.printStackTrace();
 		}
 	}
-
-}//
+}

@@ -5,108 +5,44 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 import com.kh.model.vo.Book;
 import com.kh.model.vo.Magazine;
+import static com.kh.common.JDBCTemplate.*;
 
 public class BookDao {
 
-    // 전체 도서 조회
-    public ArrayList<Book> getAllBooks(Connection conn) {
-        ArrayList<Book> list = new ArrayList<>();
-        String sql = "SELECT * FROM BOOK";
-        
-        try (PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                list.add(new Book(
-                    rs.getString("BNO"),
-                    rs.getString("TITLE"),
-                    rs.getString("AUTHOR"),
-                    rs.getString("PUBLISHER"),
-                    rs.getInt("PRICE"),
-                    rs.getString("DESCRIPTION")
-                ));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    // 일반 도서 조회
-    public ArrayList<Book> onlySearchBooks(Connection conn) {
-        ArrayList<Book> list = new ArrayList<>();
-        String sql = "SELECT * FROM BOOK WHERE TYPE = 'BOOK'";
-        
-        try (PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                list.add(new Book(
-                    rs.getString("BNO"),
-                    rs.getString("TITLE"),
-                    rs.getString("AUTHOR"),
-                    rs.getString("PUBLISHER"),
-                    rs.getInt("PRICE"),
-                    rs.getString("DESCRIPTION")
-                ));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    // 잡지만 조회
-    public ArrayList<Magazine> onlySearchMagazines(Connection conn) {
-        ArrayList<Magazine> list = new ArrayList<>();
-        String sql = "SELECT * FROM MAGAZINE";
-        
-        try (PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                list.add(new Magazine(
-                    rs.getString("BNO"),
-                    rs.getString("TITLE"),
-                    rs.getString("AUTHOR"),
-                    rs.getString("PUBLISHER"),
-                    rs.getInt("PRICE"),
-                    rs.getString("DESCRIPTION"),
-                    rs.getInt("YEAR"),
-                    rs.getInt("MONTH")
-                ));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
     // 도서 추가
     public int addBook(Connection conn, Book book) {
+        String sql = "INSERT INTO BOOK (BNO, TITLE, AUTHOR, PUBLISHER, PRICE, DESCRIPTION) VALUES (?, ?, ?, ?, ?, ?)";
+        PreparedStatement pstmt = null;
         int result = 0;
-        String sql = "INSERT INTO BOOK VALUES (?, ?, ?, ?, ?, ?)";
-        
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try {
+            pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, book.getbNo());
             pstmt.setString(2, book.getTitle());
             pstmt.setString(3, book.getAuthor());
             pstmt.setString(4, book.getPublisher());
             pstmt.setInt(5, book.getPrice());
             pstmt.setString(6, book.getDescription());
-            
-            result = pstmt.executeUpdate(); // 실행 결과를 result에 저장
+            result = pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            close(pstmt); // PreparedStatement 자원 닫기
         }
         return result;
     }
 
     // 잡지 추가
     public int addMagazine(Connection conn, Magazine magazine) {
+        String sql = "INSERT INTO MAGAZINE (BNO, TITLE, AUTHOR, PUBLISHER, PRICE, DESCRIPTION, YEAR, MONTH) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        PreparedStatement pstmt = null;
         int result = 0;
-        String sql = "INSERT INTO MAGAZINE VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+        try {
+            pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, magazine.getbNo());
             pstmt.setString(2, magazine.getTitle());
             pstmt.setString(3, magazine.getAuthor());
@@ -115,170 +51,314 @@ public class BookDao {
             pstmt.setString(6, magazine.getDescription());
             pstmt.setInt(7, magazine.getYear());
             pstmt.setInt(8, magazine.getMonth());
-            
             result = pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            close(pstmt); // PreparedStatement 자원 닫기
         }
         return result;
     }
 
-    // 도서 번호로 조회
-    public Book searchBookBybNo(Connection conn, String bNo) {
-        Book book = null;
-        String sql = "SELECT * FROM BOOK WHERE BNO = ?";
-        
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, bNo);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    book = new Book(
-                        rs.getString("BNO"),
-                        rs.getString("TITLE"),
-                        rs.getString("AUTHOR"),
-                        rs.getString("PUBLISHER"),
-                        rs.getInt("PRICE"),
-                        rs.getString("DESCRIPTION")
-                    );
-                }
+    // 전체 도서 조회
+    public ArrayList<Book> getAllBooks(Connection conn) {
+        String sql = "SELECT * FROM BOOK";
+        PreparedStatement pstmt = null;
+        ResultSet rset = null;
+        ArrayList<Book> bookList = new ArrayList<>();
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            rset = pstmt.executeQuery();
+
+            while (rset.next()) {
+                Book book = new Book(
+                        rset.getString("BNO"),
+                        rset.getString("TITLE"),
+                        rset.getString("AUTHOR"),
+                        rset.getString("PUBLISHER"),
+                        rset.getInt("PRICE"),
+                        rset.getString("DESCRIPTION")
+                );
+                bookList.add(book);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            close(rset); // ResultSet 자원 닫기
+            close(pstmt); // PreparedStatement 자원 닫기
+        }
+        return bookList;
+    }
+
+    // 일반 도서만 조회
+    public ArrayList<Book> onlySearchBooks(Connection conn) {
+        String sql = "SELECT * FROM BOOK WHERE BNO NOT IN (SELECT BNO FROM MAGAZINE)";
+        PreparedStatement pstmt = null;
+        ResultSet rset = null;
+        ArrayList<Book> bookList = new ArrayList<>();
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            rset = pstmt.executeQuery();
+
+            while (rset.next()) {
+                Book book = new Book(
+                        rset.getString("BNO"),
+                        rset.getString("TITLE"),
+                        rset.getString("AUTHOR"),
+                        rset.getString("PUBLISHER"),
+                        rset.getInt("PRICE"),
+                        rset.getString("DESCRIPTION")
+                );
+                bookList.add(book);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            close(rset);
+            close(pstmt);
+        }
+        return bookList;
+    }
+
+    // 잡지만 조회
+    public ArrayList<Magazine> onlySearchMagazines(Connection conn) {
+        String sql = "SELECT * FROM MAGAZINE";
+        PreparedStatement pstmt = null;
+        ResultSet rset = null;
+        ArrayList<Magazine> magazineList = new ArrayList<>();
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            rset = pstmt.executeQuery();
+
+            while (rset.next()) {
+                Magazine magazine = new Magazine(
+                        rset.getString("BNO"),
+                        rset.getString("TITLE"),
+                        rset.getString("AUTHOR"),
+                        rset.getString("PUBLISHER"),
+                        rset.getInt("PRICE"),
+                        rset.getString("DESCRIPTION"),
+                        rset.getInt("YEAR"),
+                        rset.getInt("MONTH")
+                );
+                magazineList.add(magazine);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            close(rset);
+            close(pstmt);
+        }
+        return magazineList;
+    }
+
+    // 도서 번호로 검색
+    public Book searchBookBybNo(Connection conn, String bNo) {
+        String sql = "SELECT * FROM BOOK WHERE BNO = ?";
+        PreparedStatement pstmt = null;
+        ResultSet rset = null;
+        Book book = null;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, bNo);
+            rset = pstmt.executeQuery();
+
+            if (rset.next()) {
+                book = new Book(
+                        rset.getString("BNO"),
+                        rset.getString("TITLE"),
+                        rset.getString("AUTHOR"),
+                        rset.getString("PUBLISHER"),
+                        rset.getInt("PRICE"),
+                        rset.getString("DESCRIPTION")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            close(rset);
+            close(pstmt);
         }
         return book;
     }
 
-    // 도서 제목으로 조회
+    // 도서 제목으로 검색
     public ArrayList<Book> searchBookByTitle(Connection conn, String title) {
-        ArrayList<Book> list = new ArrayList<>();
         String sql = "SELECT * FROM BOOK WHERE TITLE LIKE ?";
-        
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        PreparedStatement pstmt = null;
+        ResultSet rset = null;
+        ArrayList<Book> bookList = new ArrayList<>();
+
+        try {
+            pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, "%" + title + "%");
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    list.add(new Book(
-                        rs.getString("BNO"),
-                        rs.getString("TITLE"),
-                        rs.getString("AUTHOR"),
-                        rs.getString("PUBLISHER"),
-                        rs.getInt("PRICE"),
-                        rs.getString("DESCRIPTION")
-                    ));
-                }
+            rset = pstmt.executeQuery();
+
+            while (rset.next()) {
+                Book book = new Book(
+                        rset.getString("BNO"),
+                        rset.getString("TITLE"),
+                        rset.getString("AUTHOR"),
+                        rset.getString("PUBLISHER"),
+                        rset.getInt("PRICE"),
+                        rset.getString("DESCRIPTION")
+                );
+                bookList.add(book);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            close(rset);
+            close(pstmt);
         }
-        return list;
+        return bookList;
     }
 
     // 특정 연도의 잡지 조회
     public ArrayList<Magazine> magazineOfThisYearInfo(Connection conn, int year) {
-        ArrayList<Magazine> list = new ArrayList<>();
         String sql = "SELECT * FROM MAGAZINE WHERE YEAR = ?";
-        
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        PreparedStatement pstmt = null;
+        ResultSet rset = null;
+        ArrayList<Magazine> magazineList = new ArrayList<>();
+
+        try {
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, year);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    list.add(new Magazine(
-                        rs.getString("BNO"),
-                        rs.getString("TITLE"),
-                        rs.getString("AUTHOR"),
-                        rs.getString("PUBLISHER"),
-                        rs.getInt("PRICE"),
-                        rs.getString("DESCRIPTION"),
-                        rs.getInt("YEAR"),
-                        rs.getInt("MONTH")
-                    ));
-                }
+            rset = pstmt.executeQuery();
+
+            while (rset.next()) {
+                Magazine magazine = new Magazine(
+                        rset.getString("BNO"),
+                        rset.getString("TITLE"),
+                        rset.getString("AUTHOR"),
+                        rset.getString("PUBLISHER"),
+                        rset.getInt("PRICE"),
+                        rset.getString("DESCRIPTION"),
+                        rset.getInt("YEAR"),
+                        rset.getInt("MONTH")
+                );
+                magazineList.add(magazine);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            close(rset);
+            close(pstmt);
         }
-        return list;
+        return magazineList;
     }
 
-    // 출판사로 도서 조회
+    // 출판사로 도서 검색
     public ArrayList<Book> searchBookByPublisher(Connection conn, String publisher) {
-        ArrayList<Book> list = new ArrayList<>();
-        String sql = "SELECT * FROM BOOK WHERE PUBLISHER = ?";
-        
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, publisher);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    list.add(new Book(
-                        rs.getString("BNO"),
-                        rs.getString("TITLE"),
-                        rs.getString("AUTHOR"),
-                        rs.getString("PUBLISHER"),
-                        rs.getInt("PRICE"),
-                        rs.getString("DESCRIPTION")
-                    ));
-                }
+        String sql = "SELECT * FROM BOOK WHERE PUBLISHER LIKE ?";
+        PreparedStatement pstmt = null;
+        ResultSet rset = null;
+        ArrayList<Book> bookList = new ArrayList<>();
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, "%" + publisher + "%");
+            rset = pstmt.executeQuery();
+
+            while (rset.next()) {
+                Book book = new Book(
+                        rset.getString("BNO"),
+                        rset.getString("TITLE"),
+                        rset.getString("AUTHOR"),
+                        rset.getString("PUBLISHER"),
+                        rset.getInt("PRICE"),
+                        rset.getString("DESCRIPTION")
+                );
+                bookList.add(book);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            close(rset);
+            close(pstmt);
         }
-        return list;
+        return bookList;
     }
 
-    // 특정 가격 이하의 도서 조회
+    // 특정 가격 이하의 도서 검색
     public ArrayList<Book> searchBookByPrice(Connection conn, int price) {
-        ArrayList<Book> list = new ArrayList<>();
         String sql = "SELECT * FROM BOOK WHERE PRICE <= ?";
-        
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        PreparedStatement pstmt = null;
+        ResultSet rset = null;
+        ArrayList<Book> bookList = new ArrayList<>();
+
+        try {
+            pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, price);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    list.add(new Book(
-                        rs.getString("BNO"),
-                        rs.getString("TITLE"),
-                        rs.getString("AUTHOR"),
-                        rs.getString("PUBLISHER"),
-                        rs.getInt("PRICE"),
-                        rs.getString("DESCRIPTION")
-                    ));
-                }
+            rset = pstmt.executeQuery();
+
+            while (rset.next()) {
+                Book book = new Book(
+                        rset.getString("BNO"),
+                        rset.getString("TITLE"),
+                        rset.getString("AUTHOR"),
+                        rset.getString("PUBLISHER"),
+                        rset.getInt("PRICE"),
+                        rset.getString("DESCRIPTION")
+                );
+                bookList.add(book);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            close(rset);
+            close(pstmt);
         }
-        return list;
+        return bookList;
     }
 
-    // 도서 가격 합계
+    // 도서 가격 합계 조회
     public int getTotalPrice(Connection conn) {
-        int result = 0;
-        String sql = "SELECT SUM(PRICE) AS TOTAL_PRICE FROM BOOK";
-        
-        try (PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-            if (rs.next()) {
-                result = rs.getInt("TOTAL_PRICE");
+        String sql = "SELECT SUM(PRICE) AS TOTAL FROM BOOK";
+        PreparedStatement pstmt = null;
+        ResultSet rset = null;
+        int totalPrice = 0;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            rset = pstmt.executeQuery();
+
+            if (rset.next()) {
+                totalPrice = rset.getInt("TOTAL");
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            close(rset);
+            close(pstmt);
         }
-        return result;
+        return totalPrice;
     }
 
-    // 도서 가격 평균
+    // 도서 가격 평균 조회
     public double getAvgPrice(Connection conn) {
-        double result = 0.0;
-        String sql = "SELECT AVG(PRICE) AS AVG_PRICE FROM BOOK";
-        
-        try (PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-            if (rs.next()) {
-                result = rs.getDouble("AVG_PRICE");
+        String sql = "SELECT AVG(PRICE) AS AVERAGE FROM BOOK";
+        PreparedStatement pstmt = null;
+        ResultSet rset = null;
+        double avgPrice = 0.0;
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            rset = pstmt.executeQuery();
+
+            if (rset.next()) {
+                avgPrice = rset.getDouble("AVERAGE");
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            close(rset);
+            close(pstmt);
         }
-        return result;
+        return avgPrice;
     }
 }

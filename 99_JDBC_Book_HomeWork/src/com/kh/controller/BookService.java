@@ -8,63 +8,78 @@ import static com.kh.common.JDBCTemplate.*;
 
 public class BookService {
 
-    private BookDao bd = new BookDao();
+	private BookDao bd = new BookDao();
 
-    // 전체 도서 조회
-    public ArrayList<Book> getAllBooks() {
-        return bd.getAllBooks(getConnection());
-    }
+	// 전체 도서 조회
+	public ArrayList<Book> getAllBooks() {
+		return bd.getAllBooks(getConnection());
+	}
 
-    // 일반 도서만 조회
-    public ArrayList<Book> onlySearchBooks() {
-        return bd.onlySearchBooks(getConnection());
-    }
+	// 일반 도서만 조회
+	public ArrayList<Book> onlySearchBooks() {
+		return bd.onlySearchBooks(getConnection());
+	}
 
-    // 잡지만 조회
-    public ArrayList<Magazine> onlySearchMagazines() {
-        return bd.onlySearchMagazines(getConnection());
-    }
+	// 잡지만 조회
+	public ArrayList<Magazine> onlySearchMagazines() {
+		return bd.onlySearchMagazines(getConnection());
+	}
 
-    // 도서 추가
-    public int addBook(Book book) {
-        return bd.addBook(getConnection(), book);
-    }
+	// 도서 추가
+	public int addBook(Book book) {
+		return bd.addBook(getConnection(), book);
+	}
+	
+//	public int addBook(Book book) {
+//	    Connection conn = JDBCTemplate.getConnection();
+//	    int result = new BookDao().addBook(conn, book);
+//
+//	    if (result > 0) {
+//	        JDBCTemplate.commit(conn);
+//	    } else {
+//	        JDBCTemplate.rollback(conn);
+//	    }
+//
+//	    JDBCTemplate.close(conn);
+//	    return result;
+//	}
 
-    public int addMagazine(Magazine magazine) {
-        return bd.addMagazine(getConnection(), magazine);
-    }
 
-    // 도서 번호로 조회
-    public Book searchBookBybNo(String bNo) {
-        return bd.searchBookBybNo(getConnection(), bNo);
-    }
+	public int addMagazine(Magazine magazine) {
+		return bd.addMagazine(getConnection(), magazine);
+	}
 
-    // 도서 제목으로 조회
-    public ArrayList<Book> searchBookByTitle(String title) {
-        return bd.searchBookByTitle(getConnection(), title);
-    }
+	// 도서 번호로 조회
+	public Book searchBookBybNo(String bNo) {
+		return bd.searchBookBybNo(getConnection(), bNo);
+	}
 
-    // 특정 연도의 잡지 조회
-    public ArrayList<Magazine> magazineOfThisYearInfo(int year) {
-        return bd.magazineOfThisYearInfo(getConnection(), year);
-    }
+	// 도서 제목으로 조회
+	public ArrayList<Book> searchBookByTitle(String title) {
+		return bd.searchBookByTitle(getConnection(), title);
+	}
 
-    // 출판사로 도서 조회
-    public ArrayList<Book> searchBookByPublisher(String publisher) {
-        return bd.searchBookByPublisher(getConnection(), publisher);
-    }
+	// 특정 연도의 잡지 조회
+	public ArrayList<Magazine> magazineOfThisYearInfo(int year) {
+		return bd.magazineOfThisYearInfo(getConnection(), year);
+	}
 
-    // 특정 가격 이하의 도서 조회
-    public ArrayList<Book> searchBookByPrice(int price) {
-        return bd.searchBookByPrice(getConnection(), price);
-    }
+	// 출판사로 도서 조회
+	public ArrayList<Book> searchBookByPublisher(String publisher) {
+		return bd.searchBookByPublisher(getConnection(), publisher);
+	}
 
-    // 도서 가격 합계 및 평균 조회
-    public int getTotalPrice() {
-        return bd.getTotalPrice(getConnection());
-    }
+	// 특정 가격 이하의 도서 조회
+	public ArrayList<Book> searchBookByPrice(int price) {
+		return bd.searchBookByPrice(getConnection(), price);
+	}
 
-    public double getAvgPrice() {
-        return bd.getAvgPrice(getConnection());
-    }
+	// 도서 가격 합계 및 평균 조회
+	public int getTotalPrice() {
+		return bd.getTotalPrice(getConnection());
+	}
+
+	public double getAvgPrice() {
+		return bd.getAvgPrice(getConnection());
+	}
 }
