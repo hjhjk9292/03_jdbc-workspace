@@ -1,122 +1,70 @@
-package com.kh.book.model.service;
+package com.kh.controller;
 
-import java.sql.Connection;
 import java.util.ArrayList;
-
+import com.kh.model.dao.BookDao;
+import com.kh.model.vo.Book;
+import com.kh.model.vo.Magazine;
 import static com.kh.common.JDBCTemplate.*;
-import com.kh.book.model.dao.BookDao;
-import com.kh.book.model.vo.Book;
-import com.kh.book.model.vo.Magazine;
 
 public class BookService {
 
-	// 도서 추가
-	public int addBook(Book book) {
-		Connection conn = getConnection();
-		int result = new BookDao().addBook(conn, book);
+    private BookDao bd = new BookDao();
 
-		if (result > 0) {
-			commit(conn);
-		} else {
-			rollback(conn);
-		}
+    // 전체 도서 조회
+    public ArrayList<Book> getAllBooks() {
+        return bd.getAllBooks(getConnection());
+    }
 
-		close(conn);
-		return result; // 성공 시 1, 실패 시 0 반환
-	}
+    // 일반 도서만 조회
+    public ArrayList<Book> onlySearchBooks() {
+        return bd.onlySearchBooks(getConnection());
+    }
 
-	// 잡지 추가
-	public int addMagazine(Magazine magazine) {
-		Connection conn = getConnection();
-		int result = new BookDao().addMagazine(conn, magazine);
+    // 잡지만 조회
+    public ArrayList<Magazine> onlySearchMagazines() {
+        return bd.onlySearchMagazines(getConnection());
+    }
 
-		if (result > 0) {
-			commit(conn);
-		} else {
-			rollback(conn);
-		}
+    // 도서 추가
+    public int addBook(Book book) {
+        return bd.addBook(getConnection(), book);
+    }
 
-		close(conn);
-		return result; // 성공 시 1, 실패 시 0 반환
-	}
+    public int addMagazine(Magazine magazine) {
+        return bd.addMagazine(getConnection(), magazine);
+    }
 
-	// 전체 책 조회
-	public ArrayList<Book> getAllBooks() {
-		Connection conn = getConnection();
-		ArrayList<Book> list = new BookDao().getAllBooks(conn);
-		close(conn);
-		return list;
-	}
+    // 도서 번호로 조회
+    public Book searchBookBybNo(String bNo) {
+        return bd.searchBookBybNo(getConnection(), bNo);
+    }
 
-	// 일반도서만 조회
-	public ArrayList<Book> onlySearchBook() {
-		Connection conn = getConnection();
-		ArrayList<Book> list = new BookDao().onlySearchBook(conn);
-		close(conn);
-		return list;
-	}
+    // 도서 제목으로 조회
+    public ArrayList<Book> searchBookByTitle(String title) {
+        return bd.searchBookByTitle(getConnection(), title);
+    }
 
-	// 잡지만 조회
-	public ArrayList<Book> onlySearchMagazine() {
-		Connection conn = getConnection();
-		ArrayList<Book> list = new BookDao().onlySearchMagazine(conn);
-		close(conn);
-		return list;
-	}
+    // 특정 연도의 잡지 조회
+    public ArrayList<Magazine> magazineOfThisYearInfo(int year) {
+        return bd.magazineOfThisYearInfo(getConnection(), year);
+    }
 
-	// bNo로 책 찾기
-	public Book searchBookBybNo(String bNo) {
-		Connection conn = getConnection();
-		Book book = new BookDao().searchBookBybNo(conn, bNo);
-		close(conn);
-		return book;
-	}
+    // 출판사로 도서 조회
+    public ArrayList<Book> searchBookByPublisher(String publisher) {
+        return bd.searchBookByPublisher(getConnection(), publisher);
+    }
 
-	// 책 제목으로 책 찾기
-	public ArrayList<Book> searchBookByTitle(String title) {
-		Connection conn = getConnection();
-		ArrayList<Book> list = new BookDao().searchBookByTitle(conn, title);
-		close(conn);
-		return list;
-	}
+    // 특정 가격 이하의 도서 조회
+    public ArrayList<Book> searchBookByPrice(int price) {
+        return bd.searchBookByPrice(getConnection(), price);
+    }
 
-	// 출간연도로 잡지 찾기
-	public ArrayList<Magazine> magazineOfThisYearInfo(int year) {
-		Connection conn = getConnection();
-		ArrayList<Magazine> list = new BookDao().magazineOfThisYearInfo(conn, year);
-		close(conn);
-		return list;
-	}
+    // 도서 가격 합계 및 평균 조회
+    public int getTotalPrice() {
+        return bd.getTotalPrice(getConnection());
+    }
 
-	// 출판사로 책 찾기
-	public ArrayList<Book> searchBookByPublisher(String publisher) {
-		Connection conn = getConnection();
-		ArrayList<Book> list = new BookDao().searchBookByPublisher(conn, publisher);
-		close(conn);
-		return list;
-	}
-
-	// 특정 가격 밑으로 책 찾기
-	public ArrayList<Book> searchBookByPrice(int price) {
-		Connection conn = getConnection();
-		ArrayList<Book> list = new BookDao().searchBookByPrice(conn, price);
-		close(conn);
-		return list;
-	}
-
-	// 전체 책 가격 합계
-	public int getTotalPrice() {
-		Connection conn = getConnection();
-		int totalPrice = new BookDao().getTotalPrice(conn);
-		close(conn);
-		return totalPrice;
-	}
-
-	// 전체 책 가격 평균
-	public double getAvgPrice() {
-		Connection conn = getConnection();
-		double avgPrice = new BookDao().getAvgPrice(conn);
-		close(conn);
-		return avgPrice;
-	}
+    public double getAvgPrice() {
+        return bd.getAvgPrice(getConnection());
+    }
 }
