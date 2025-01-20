@@ -1,5 +1,6 @@
 package com.kh.view;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import com.kh.controller.BookController;
 import com.kh.model.vo.Book;
@@ -47,6 +48,11 @@ public class BookMenu {
 		}
 	}
 
+	private void getTotalAndAvgPrice() {
+		// TODO Auto-generated method stub
+
+	}
+
 	private void viewBooks() {
 		System.out.println("\n어떤 방법으로 책을 조회하겠습니까?");
 		System.out.println("1. 도서관 전체 소장책 조회하기");
@@ -60,13 +66,13 @@ public class BookMenu {
 
 		switch (choice) {
 		case 1:
-			System.out.println(bc.getAllBook());
+			bc.getAllBooks(); // 전체 도서 출력
 			break;
 		case 2:
-			System.out.println(bc.onlySearchBook());
+			bc.onlySearchBooks(); // 일반 도서 출력
 			break;
 		case 3:
-			System.out.println(bc.onlySearchMagazine());
+			bc.onlySearchMagazines(); // 잡지 출력
 			break;
 		case 4:
 			return;
@@ -76,11 +82,8 @@ public class BookMenu {
 	}
 
 	private void addBook() {
-	    System.out.print("bNo을 입력하세요 : ");
-	    String bNo = sc.nextLine(); // String으로 입력 받음
-
-	    System.out.print("책 제목을 입력하세요 : ");
-	    String title = sc.nextLine();
+		System.out.print("책 제목을 입력하세요 : ");
+		String title = sc.nextLine();
 
 		System.out.print("작가를 입력하세요 : ");
 		String author = sc.nextLine();
@@ -100,25 +103,17 @@ public class BookMenu {
 		sc.nextLine();
 
 		if (isBook) {
-		    boolean result = bc.addBook(new Book(bNo, title, author, publisher, price, description));
-		    if (result) {
-		        System.out.println("도서가 성공적으로 추가되었습니다.");
-		    } else {
-		        System.out.println("도서 추가에 실패했습니다. 중복된 번호일 수 있습니다.");
-		    }
+			Book book = new Book(null, title, author, publisher, price, description);
+			bc.addBook(book);
 		} else {
-		    System.out.print("출간연도를 입력하세요 : ");
-		    int year = sc.nextInt();
-		    System.out.print("출간월을 입력하세요 : ");
-		    int month = sc.nextInt();
-		    sc.nextLine();
+			System.out.print("출간연도를 입력하세요 : ");
+			int year = sc.nextInt();
+			System.out.print("출간월을 입력하세요 : ");
+			int month = sc.nextInt();
+			sc.nextLine();
 
-		    boolean result = bc.addBook(new Magazine(bNo, title, author, publisher, price, description, year, month));
-		    if (result) {
-		        System.out.println("잡지가 성공적으로 추가되었습니다.");
-		    } else {
-		        System.out.println("잡지 추가에 실패했습니다. 중복된 번호일 수 있습니다.");
-		    }
+			Magazine magazine = new Magazine(null, title, author, publisher, price, description, year, month);
+			bc.addMagazine(magazine);
 		}
 	}
 
@@ -139,29 +134,29 @@ public class BookMenu {
 		case 1:
 			System.out.print("bNo을 입력하세요 : ");
 			String bNo = sc.nextLine();
-			System.out.println(bc.searchBookBybNo(bNo));
+			bc.searchBookBybNo(bNo);
 			break;
 		case 2:
 			System.out.print("책 제목을 입력하세요 : ");
 			String title = sc.nextLine();
-			System.out.println(bc.searchBookByTitle(title));
+			bc.searchBookByTitle(title);
 			break;
 		case 3:
 			System.out.print("출간연도를 입력하세요 : ");
 			int year = sc.nextInt();
 			sc.nextLine();
-			System.out.println(bc.magazineOfThisYearInfo(year));
+			bc.magazineOfThisYearInfo(year);
 			break;
 		case 4:
 			System.out.print("출판사를 입력하세요 : ");
 			String publisher = sc.nextLine();
-			System.out.println(bc.searchBookByPublisher(publisher));
+			bc.searchBookByPublisher(publisher);
 			break;
 		case 5:
 			System.out.print("가격을 입력하세요 : ");
 			int price = sc.nextInt();
 			sc.nextLine();
-			System.out.println(bc.searchBookByPrice(price));
+			bc.searchBookByPrice(price);
 			break;
 		case 6:
 			return;
@@ -170,8 +165,46 @@ public class BookMenu {
 		}
 	}
 
-	private void showTotalAndAverage() {
-		System.out.println("전체책 가격 합계 : " + bc.getTotalPrice() + "원");
-		System.out.println("전체책 가격 평균 : " + bc.getAvgPrice() + "원");
+	public void displayBookList(ArrayList<Book> bookList) {
+		System.out.println("========= 도서 목록 =========");
+		for (Book book : bookList) {
+			System.out.println(book);
+		}
 	}
+
+	public void displayMagazineList(ArrayList<Magazine> magazineList) {
+		System.out.println("========= 잡지 목록 =========");
+		for (Magazine magazine : magazineList) {
+			System.out.println(magazine);
+		}
+	}
+
+	private void showTotalAndAverage() {
+		bc.getTotalAndAvgPrice(); // BookController의 getTotalAndAvgPrice 호출
+	}
+
+	public void displayTotalAndAvgPrice(int total, double avg) {
+		System.out.println("========= 도서 가격 정보 =========");
+		System.out.println("전체 책 가격 합계: " + total + "원");
+		System.out.println("전체 책 가격 평균: " + String.format("%.2f", avg) + "원");
+	}
+
+	// --------------------------------------------------
+
+	public void displaySuccess(String message) {
+		System.out.println("[성공] " + message);
+	}
+
+	public void displayFail(String message) {
+		System.out.println("[실패] " + message);
+	}
+
+	public void displayNoData(String message) {
+		System.out.println("[조회 결과 없음] " + message);
+	}
+
+	public void displayBook(Book book) {
+		System.out.println(book);
+	}
+
 }
