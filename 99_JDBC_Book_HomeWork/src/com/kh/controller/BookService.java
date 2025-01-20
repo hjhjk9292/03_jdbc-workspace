@@ -1,5 +1,6 @@
 package com.kh.controller;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import com.kh.model.dao.BookDao;
 import com.kh.model.vo.Book;
@@ -27,7 +28,19 @@ public class BookService {
 
 	// 도서 추가
 	public int addBook(Book book) {
-		return bd.addBook(getConnection(), book);
+		Connection conn = getConnection();
+		int result = bd.addBook(conn, book);
+		if(result > 0) {
+			commit(conn);
+		}else {
+			rollback(conn);
+		}
+		
+		close(conn);
+		
+		System.out.println("bookSerivce result : " + result);
+		
+		return result;
 	}
 	
 //	public int addBook(Book book) {

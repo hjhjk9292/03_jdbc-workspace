@@ -26,12 +26,15 @@ public class BookDao {
             pstmt.setString(4, book.getPublisher());
             pstmt.setInt(5, book.getPrice());
             pstmt.setString(6, book.getDescription());
+            
             result = pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             close(pstmt); // PreparedStatement 자원 닫기
         }
+        
+        System.out.println("bookdao result : " + result);
         return result;
     }
 
