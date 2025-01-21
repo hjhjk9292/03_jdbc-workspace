@@ -1,0 +1,109 @@
+--JDBC수업용계정 --이클립스 ProductStockManager
+
+DROP TABLE PRODUCT_IO;
+DROP TRIGGER TRG_PRODUCT_IO;
+DROP SEQUENCE SEQ_IO_NUM;
+
+
+-- PRODUCT 테이블의 상품 삭제시 
+--PRODUCT_IO 테이블에도 해당 상품 관련된 데이터들이 삭제 되도록 외래키 제약조건 옵션 부여 
+--IO_DATE 컬럼의 기본값 SYSDATE, STATUS 컬럼의 값으로는
+--‘입고’ 혹은 ‘출고’만 INSERT 될 수 있도록 제약 조건 부여 할 것
+
+-- Product_IO 테이블 생성
+CREATE TABLE PRODUCT_IO (
+    IO_NUM NUMBER PRIMARY KEY,
+    PRODUCT_ID VARCHAR2(20) REFERENCES PRODUCT(PRODUCT_ID) ON DELETE CASCADE,
+    IO_DATE DATE DEFAULT SYSDATE NOT NULL,
+    AMOUNT NUMBER NOT NULL,
+    STATUS VARCHAR2(10) CHECK (STATUS IN ('입고', '출고'))
+);
+
+-- PRODUCT_IO 테이블에 데이터 INSERT시 IO_NUM을 위한 SEQUENCE 생성 후 작업
+-- 시퀀스 생성
+CREATE SEQUENCE SEQ_IO_NUM
+START WITH 1
+INCREMENT BY 1
+NOCACHE;
+
+
+-- PRODUCT_IO 테이블에 입고 또는 출고에 대한 데이터 삽입 시 각 상태에 따라 
+-- PROUDCT 테이블의 STOCK 컬럼 값이 자동으로 수정되도록 트리거를 생성 후 작업
+
+-- 트리거 생성
+--CREATE OR REPLACE TRIGGER TRG_PRODUCT_IO
+--AFTER INSERT ON PRODUCT
+--FOR EACH ROW
+--BEGIN
+--    -- 상품이 입고된 경우 => 재고수량 증가
+--    IF :NEW.STATUS = '입고' THEN
+--        UPDATE PRODUCT
+--        SET STOCK = STOCK + :NEW.AMOUNT
+--        WHERE PRODUCT_ID = :NEW.PRODUCT_ID;
+--    END IF;
+--
+--    -- 상품이 출고된 경우 => 재고수량 감소
+--    IF :NEW.STATUS = '출고' THEN
+--        UPDATE PRODUCT
+--        SET STOCK = STOCK - :NEW.AMOUNT
+--        WHERE PRODUCT_ID = :NEW.PRODUCT_ID;
+--    END IF;
+--END;
+--/
+
+
+
+CREATE OR REPLACE TRIGGER TRG_PRODUCT_IO
+BEFORE INSERT OR UPDATE ON Product_IO
+FOR EACH ROW
+DECLARE
+   v_stock NUMBER;
+BEGIN
+   IF :NEW.STATUS = '출고' THEN
+      SELECT STOCK INTO v_stock FROM Product WHERE PRODUCT_ID = :NEW.PRODUCT_ID;
+--      IF v_stock < :NEW.AMOUNT THEN
+--         RAISE_APPLICATION_ERROR(-20001, '재고가 부족하여 출고가 불가능합니다.');
+--      END IF;
+      UPDATE Product SET STOCK = STOCK - :NEW.AMOUNT WHERE PRODUCT_ID = :NEW.PRODUCT_ID;
+   ELSIF :NEW.STATUS = '입고' THEN
+      UPDATE Product SET STOCK = STOCK + :NEW.AMOUNT WHERE PRODUCT_ID = :NEW.PRODUCT_ID;
+   END IF;
+END;
+/
+
+
+-- 샘플 데이터 삽입
+INSERT INTO PRODUCT_IO VALUES (SEQ_IO_NUM.NEXTVAL, 'nb_ss7', SYSDATE, 30, '입고');
+INSERT INTO PRODUCT_IO VALUES (SEQ_IO_NUM.NEXTVAL, 'nb_ss7', SYSDATE, 5, '출고');
+INSERT INTO PRODUCT_IO VALUES (SEQ_IO_NUM.NEXTVAL, 'pc_ibm', SYSDATE, 20, '입고');
+
+
+
+SELECT * FROM PRODUCT;
+SELECT * FROM PRODUCT_IO;
+
+commit;
+
+
+-- 입출고 전체 조회
+		SELECT IO_NUM
+			 , PRODUCT_ID
+			 , P_NAME
+			 , IO_DATE
+			 , AMOUNT
+			 , STATUS
+		FROM
+			   PRODUCT_IO
+		JOIN   PRODUCT USING(PRODUCT_ID);
+        
+-- 입고만 조회 / 출고만 조회 WHERE STATUS = '입고';  '출고';
+		SELECT IO_NUM
+			 , PRODUCT_ID
+			 , P_NAME
+			 , IO_DATE
+			 , AMOUNT
+			 , STATUS
+		  FROM PRODUCT_IO
+		  JOIN PRODUCT USING(PRODUCT_ID)
+	     WHERE STATUS = '입고';
+        
