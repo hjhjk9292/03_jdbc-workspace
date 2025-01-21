@@ -100,14 +100,16 @@
 	     WHERE STATUS = '출고'	
 	</entry>
 	
-	<entry key = "ProductInput">
-	
+	<entry key="insertProductIO">
+	    INSERT INTO PRODUCT_IO (PRODUCT_ID, IO_DATE, AMOUNT, STATUS)
+	    VALUES (?, SYSDATE, ?, ?)
 	</entry>
 	
-	
-	<entry key = "ProductOutput">
-	
+	<entry key="checkStock">
+	    SELECT STOCK FROM PRODUCT WHERE PRODUCT_ID = ?
 	</entry>
+
+
 
 
 </properties>

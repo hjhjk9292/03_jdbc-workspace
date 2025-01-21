@@ -76,5 +76,6 @@ public class ProductIO {
 		return "ProductIO [ioNum=" + ioNum + ", productId=" + productId + ", productName=" + productName + ", ioDate="
 				+ ioDate + ", amount=" + amount + ", status=" + status + "]";
 	}
+
 	
 }

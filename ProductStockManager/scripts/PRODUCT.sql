@@ -31,45 +31,42 @@ NOCACHE;
 -- PROUDCT 테이블의 STOCK 컬럼 값이 자동으로 수정되도록 트리거를 생성 후 작업
 
 -- 트리거 생성
---CREATE OR REPLACE TRIGGER TRG_PRODUCT_IO
---AFTER INSERT ON PRODUCT
---FOR EACH ROW
---BEGIN
---    -- 상품이 입고된 경우 => 재고수량 증가
---    IF :NEW.STATUS = '입고' THEN
---        UPDATE PRODUCT
---        SET STOCK = STOCK + :NEW.AMOUNT
---        WHERE PRODUCT_ID = :NEW.PRODUCT_ID;
---    END IF;
---
---    -- 상품이 출고된 경우 => 재고수량 감소
---    IF :NEW.STATUS = '출고' THEN
---        UPDATE PRODUCT
---        SET STOCK = STOCK - :NEW.AMOUNT
---        WHERE PRODUCT_ID = :NEW.PRODUCT_ID;
---    END IF;
---END;
---/
-
-
-
 CREATE OR REPLACE TRIGGER TRG_PRODUCT_IO
-BEFORE INSERT OR UPDATE ON Product_IO
+BEFORE INSERT ON PRODUCT_IO
 FOR EACH ROW
-DECLARE
-   v_stock NUMBER;
 BEGIN
+   IF :NEW.IO_NUM IS NULL THEN
+      :NEW.IO_NUM := SEQ_IO_NUM.NEXTVAL; -- SEQ_IO_NUM 시퀀스를 사용하여 자동 생성
+   END IF;
+
    IF :NEW.STATUS = '출고' THEN
-      SELECT STOCK INTO v_stock FROM Product WHERE PRODUCT_ID = :NEW.PRODUCT_ID;
---      IF v_stock < :NEW.AMOUNT THEN
---         RAISE_APPLICATION_ERROR(-20001, '재고가 부족하여 출고가 불가능합니다.');
---      END IF;
-      UPDATE Product SET STOCK = STOCK - :NEW.AMOUNT WHERE PRODUCT_ID = :NEW.PRODUCT_ID;
+      UPDATE PRODUCT SET STOCK = STOCK - :NEW.AMOUNT WHERE PRODUCT_ID = :NEW.PRODUCT_ID;
    ELSIF :NEW.STATUS = '입고' THEN
-      UPDATE Product SET STOCK = STOCK + :NEW.AMOUNT WHERE PRODUCT_ID = :NEW.PRODUCT_ID;
+      UPDATE PRODUCT SET STOCK = STOCK + :NEW.AMOUNT WHERE PRODUCT_ID = :NEW.PRODUCT_ID;
    END IF;
 END;
 /
+
+
+
+
+--CREATE OR REPLACE TRIGGER TRG_PRODUCT_IO
+--BEFORE INSERT OR UPDATE ON Product_IO
+--FOR EACH ROW
+--DECLARE
+--   v_stock NUMBER;
+--BEGIN
+--   IF :NEW.STATUS = '출고' THEN
+--      SELECT STOCK INTO v_stock FROM Product WHERE PRODUCT_ID = :NEW.PRODUCT_ID;
+----      IF v_stock < :NEW.AMOUNT THEN
+----         RAISE_APPLICATION_ERROR(-20001, '재고가 부족하여 출고가 불가능합니다.');
+----      END IF;
+--      UPDATE Product SET STOCK = STOCK - :NEW.AMOUNT WHERE PRODUCT_ID = :NEW.PRODUCT_ID;
+--   ELSIF :NEW.STATUS = '입고' THEN
+--      UPDATE Product SET STOCK = STOCK + :NEW.AMOUNT WHERE PRODUCT_ID = :NEW.PRODUCT_ID;
+--   END IF;
+--END;
+--/
 
 
 -- 샘플 데이터 삽입
@@ -109,7 +106,7 @@ commit;
          
          
          
-         
+SELECT STOCK FROM PRODUCT WHERE PRODUCT_ID = 'nb_ss7';        
          
          
 commit;
