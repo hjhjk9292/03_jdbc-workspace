@@ -83,11 +83,29 @@
 			 , IO_DATE
 			 , AMOUNT
 			 , STATUS
-		  FROM
-			   PRODUCT_IO
-		  JOIN PRODUCT USING(PRODUCT_ID);
+		  FROM PRODUCT_IO
+		  JOIN PRODUCT USING(PRODUCT_ID)
 	     WHERE STATUS = '입고'
+	</entry>
 	
+	<entry key = "selectProductOutput">
+		SELECT IO_NUM
+			 , PRODUCT_ID
+			 , P_NAME
+			 , IO_DATE
+			 , AMOUNT
+			 , STATUS
+		  FROM PRODUCT_IO
+		  JOIN PRODUCT USING(PRODUCT_ID)
+	     WHERE STATUS = '출고'	
+	</entry>
+	
+	<entry key = "ProductInput">
+	
+	</entry>
+	
+	
+	<entry key = "ProductOutput">
 	
 	</entry>
 

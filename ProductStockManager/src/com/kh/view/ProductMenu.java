@@ -68,7 +68,7 @@ public class ProductMenu {
 			System.out.println("1. 전체 입출고 내역 조회");
 			System.out.println("2. 입고 내역만 조회");
 			System.out.println("3. 출고 내역만 조회");
-			System.out.println("4. 상품 입고");// 입고할 상품ID와 입고수량 입력받기 
+			System.out.println("4. 상품 입고");// 입고할 상품ID와 입고수량 입력받기
 			System.out.println("5. 상품 출고");// 출고할 상품ID와 출고수량 입력받기
 			System.out.println("9. 메인 메뉴로 돌아가기");
 
@@ -100,9 +100,6 @@ public class ProductMenu {
 
 		}
 	}
-	
-	
-
 
 	public void inputProduct() {
 
@@ -167,22 +164,40 @@ public class ProductMenu {
 		System.out.print("\n 상품 이름(키워드) 입력 : ");
 		return sc.nextLine();
 	}
-	
-	
-	
-	//--------------------------- 입출고 메뉴 -----------------------------------
-	
-	public void ProductInput() {
-		
-	}
-	
-	public void ProductOutput() {
-		
-	}
-	
-	
 
-	// --------------------------------------- 응답 화면 -------------------------------------
+	// --------------------------- 입출고 메뉴 -----------------------------------
+
+	public void ProductInput() {
+		System.out.print("상품 아이디 : ");
+		String productId = sc.nextLine();
+		
+		System.out.print("입고 수량 : ");
+		int amount = sc.nextInt();
+		sc.nextLine();
+		
+//		pc.productInput(productId, amount);
+//		System.out.println("상품 입고 처리가 완료되었습니다.");
+
+	}
+
+	public void ProductOutput() {
+		System.out.print("상품 아이디 : ");
+		String productId = sc.nextLine();
+		
+		System.out.print("출고 수량 : ");
+		int amount = sc.nextInt();
+		sc.nextLine();
+		
+		boolean result = pc.productOutput(productId, amount);
+		if(result) {
+			System.out.println("성공적으로 출고하였습니다.");
+		} else {
+			System.err.println("서비스 요청 실패 : 출고하고자 하는 제품의 재고 수량이 부족합니다.");
+		}
+
+	}
+
+	// ---------------------------------- 응답 화면 --------------------------------
 
 	public void displaySuccess(String message) {
 		System.out.println("\n 서비스 요청 성공 : " + message);
@@ -208,23 +223,12 @@ public class ProductMenu {
 		System.out.println("\n 조회된 데이터는 다음과 같습니다.\n");
 		System.out.println(p);
 	}
-	
-	
+
 	public void displayProductIOList(ArrayList<ProductIO> list) {
-	    System.out.println("\n===== 상품 리스트 =====");
-	    for (ProductIO io : list) {
-	        System.out.println(io);
-	    }
+		System.out.println("\n===== 상품 리스트 =====");
+		for (ProductIO io : list) {
+			System.out.println(io);
+		}
 	}
-
-
-	
-	
-	
-	
-	
-	
-	
-	
 
 }//

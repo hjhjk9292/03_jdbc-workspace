@@ -7,115 +7,112 @@ import static com.kh.common.JDBCTemplate.*;
 import com.kh.model.dao.ProductDao;
 import com.kh.model.vo.Product;
 import com.kh.model.vo.ProductIO;
+import com.kh.view.ProductMenu;
 
 public class ProductService {
-	
-	public ArrayList<Product> selectList(){
+
+	public ArrayList<Product> selectList() {
 		Connection conn = getConnection();
 		ArrayList<Product> list = new ProductDao().selectList(conn);
-		
+
 		close(conn);
-		
+
 		return list;
 	}
 
-	
 	public int inputProduct(Product p) {
 		Connection conn = getConnection();
 		int result = new ProductDao().inputProduct(conn, p);
-		
-		if(result > 0) {
+
+		if (result > 0) {
 			commit(conn);
-		}else {
+		} else {
 			rollback(conn);
 		}
 		close(conn);
 		return result;
 	}
-	
-	
-	
+
 	public int updateProduct(Product p) {
 		Connection conn = getConnection();
 		int result = new ProductDao().updateProduct(conn, p);
-		
-		if(result > 0) {
+
+		if (result > 0) {
 			commit(conn);
-		}else {
+		} else {
 			rollback(conn);
 		}
-		
+
 		close(conn);
 		return result;
 	}
-	
-	
-	
+
 	public int deleteProduct(String productId) {
 		Connection conn = getConnection();
 		int result = new ProductDao().deleteProduct(conn, productId);
-		
-		if(result > 0) {
+
+		if (result > 0) {
 			commit(conn);
-		}else {
+		} else {
 			rollback(conn);
 		}
-		
+
 		close(conn);
 		return result;
 	}
-	
-	
-	public ArrayList<Product> selectByProductName(String keyword){
-		
+
+	public ArrayList<Product> selectByProductName(String keyword) {
+
 		Connection conn = getConnection();
 		ArrayList<Product> list = new ProductDao().selectByProductName(conn, keyword);
-		
+
 		close(conn);
 		return list;
 	}
-	
-	
-	//----------------------------------------------------------------------
-	
+
+	// ----------------------------------------------------------------------
+
 	public ArrayList<ProductIO> selectProductIO() {
 		Connection conn = getConnection();
 		ArrayList<ProductIO> list = new ProductDao().selectProductIO(conn);
-		
+
 		close(conn);
-		
+
 		return list;
-		
+
 	}
-	
+
 	public ArrayList<ProductIO> selectProductInput() {
 		Connection conn = getConnection();
 		ArrayList<ProductIO> list = new ProductDao().selectProductInput(conn);
-		
+
 		close(conn);
-		
+
 		return list;
 	}
-	
-	
+
 	public ArrayList<ProductIO> selectProductOutput() {
 		Connection conn = getConnection();
 		ArrayList<ProductIO> list = new ProductDao().selectProductOutput(conn);
-		
+
 		close(conn);
-		
+
 		return list;
 	}
 
 
-	public int productIntput() {
+	public int productInput(ProductIO productIO) {
 		return 0;
 	}
 	
-	
-	public int productOutput() {
+	public int productOutput(String productId, int amount) {
+//		int result = new ProductService().productOutput();
+//		if (result > 0) {
+//			new ProductMenu().displaySuccess(productId);
+//		}
+//		return false;
 		return 0;
 	}
-	
-	
+
+
 }//

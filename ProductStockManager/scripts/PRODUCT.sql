@@ -106,4 +106,11 @@ commit;
 		  FROM PRODUCT_IO
 		  JOIN PRODUCT USING(PRODUCT_ID)
 	     WHERE STATUS = 'ют╟М';
+         
+         
+         
+         
+         
+         
+commit;
         
